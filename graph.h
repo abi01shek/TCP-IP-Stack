@@ -1,6 +1,6 @@
 /**
  * @file graph.h
- * @author abishek
+ * @author Abishek Ramdas
  * @brief Graph data structure to represent network topology
  */
 
@@ -48,10 +48,22 @@ typedef struct link_ {
     unsigned int cost; ///< cost of this link, not used
 } link_t;
 
+// map function to extract node information from gl linked list node
+GLTHREAD_TO_STRUCT(graph_glue_to_node, node_t, graph_glue)
 
 // Functions
 extern graph_t* create_new_graph(const char *topology_name);
 extern node_t* create_graph_node(graph_t *graph, const char *node_name);
+extern link_t* insert_link_between_two_nodes(node_t *node1,
+                                         node_t *node2,
+                                         char *from_if_name,
+                                         char *to_if_name,
+                                         unsigned int cost);
+
+// Print functions
+extern void dump_graph(graph_t *graph);
+extern void dump_node(node_t *node);
+extern void dump_interface(interface_t *if1);
 
 
 // Helper functions
@@ -98,5 +110,51 @@ static inline int get_free_if_idx_from_node(node_t *node){
     return -1; // failed to find empty interface in current node
 }
 
+/**
+ * @brief Search for interface matching interface name in a node
+ *
+ * @param  node: pointer to node to search in
+ * @param  if_name: interface name to search for
+ * @return interface: pointer to interface struct matching if_name in node upon success
+ *         NULL: upon failure
+ */
+static inline interface_t *
+get_node_if_by_name(node_t *node, char *if_name){
+    interface_t *if1 = NULL;
+    for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
+        if(node->interfaces[i] == NULL){
+            // No more interfaces found,
+            break;
+        }
+        if(strncmp(node->interfaces[i]->interface_name, if_name, IF_NAME_SIZE) == 0){
+            if1 = node->interfaces[i];
+            break;
+        }
+        // else if i does not mach if_name so continue
+    }
+    return if1;
+}
+
+
+/**
+ * @brief Given node name get the node from a graph.
+ *
+ * @param  topo: pointer to graph
+ * @param  node_name: pointer to name of node string
+ * @return node: pointer to node when able to find
+ *         NULL: failure
+ */
+static inline node_t *
+get_node_by_node_name(graph_t *topo, char *node_name){
+    node_t *node = NULL;
+    glthread_t *curr;
+    ITERATE_GLTHREAD_BEGIN(&topo->node_list, curr){
+        node = graph_glue_to_node(curr);
+        if(strncmp(node->node_name, node_name, NODE_NAME_SIZE) == 0){
+            break;
+        }
+    } ITERATE_GLTHREAD_END(&topo->node_list, curr);
+    return node;
+}
 
 #endif

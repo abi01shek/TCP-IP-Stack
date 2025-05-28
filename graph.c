@@ -1,3 +1,9 @@
+/**
+ * @file graph.c
+ * @author Abishek Ramdas
+ * @brief  Function definitions for graph library
+ */
+
 #include "graph.h"
 #include "gluethread/glthread.h"
 #include <stdio.h>
@@ -11,6 +17,10 @@
  */
 graph_t* create_new_graph(const char *topology_name){
     graph_t *new_graph  = calloc(1, sizeof(graph_t));
+    if(new_graph == NULL){
+        perror("calloc:");
+        return NULL;
+    }
     memset(new_graph->topology_name, '\0', sizeof(new_graph->topology_name));
     strcpy(new_graph->topology_name, topology_name);
     init_glthread(&new_graph->node_list);
@@ -30,6 +40,10 @@ graph_t* create_new_graph(const char *topology_name){
  */
 node_t* create_graph_node(graph_t *graph, const char *node_name){
     node_t* nodep = calloc(1, sizeof(node_t));
+    if(nodep == NULL){
+        perror("calloc:");
+        return NULL;
+    }
     memset(nodep->node_name, '\0', sizeof(nodep->node_name));
     strcpy(nodep->node_name, node_name);
     for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
@@ -46,12 +60,12 @@ node_t* create_graph_node(graph_t *graph, const char *node_name){
  * @param  node2: pointer to second node
  * @param  from_if_name: interface name on first node
  * @param  to_if_name: interface name on second node
- * @param  cost: cost of the link 
- * @return  0: on success
- *         <0: fail
+ * @param  cost: cost of the link
+ * @return link: pointer to link on success
+ *         NULL: fail
  *
  */
-int insert_link_between_two_nodes(node_t *node1,
+link_t* insert_link_between_two_nodes(node_t *node1,
                                    node_t *node2,
                                    char *from_if_name,
                                    char *to_if_name,
@@ -60,19 +74,19 @@ int insert_link_between_two_nodes(node_t *node1,
     link_t *new_link = calloc(1, sizeof(link_t));
     if(new_link == NULL){
         perror("calloc:");
-        return -1;
+        return NULL;
     }
 
     int node1_free_if = get_free_if_idx_from_node(node1);
     if(node1_free_if < 0){
         printf("Unable to find free interface on node1\n");
-        return -1;
+        return NULL;
     }
 
     int node2_free_if = get_free_if_idx_from_node(node2);
     if(node2_free_if < 0){
         printf("Unable to find free interface on node2\n");
-        return -1;
+        return NULL;
     }
 
     new_link->if1.link = new_link;
@@ -81,16 +95,50 @@ int insert_link_between_two_nodes(node_t *node1,
 
     interface_t *if1 = &new_link->if1;
     strncpy(if1->interface_name, from_if_name, IF_NAME_SIZE);
+    if1->interface_name[IF_NAME_SIZE-1] = '\0';
     if1->link = new_link;
     if1->attached_node = node1;
 
     interface_t *if2 = &new_link->if2;
     strncpy(if2->interface_name, to_if_name, IF_NAME_SIZE);
+    if2->interface_name[IF_NAME_SIZE-1] = '\0';
     if2->link = new_link;
     if2->attached_node = node2;
 
     node1->interfaces[node1_free_if] = if1;
     node2->interfaces[node2_free_if] = if2;
 
-    return 0; // success
+    return new_link; // success
+}
+
+
+void dump_graph(graph_t *graph){
+    node_t *node;
+    glthread_t *curr;
+    printf("Topology Name = %s\n", graph->topology_name);
+    ITERATE_GLTHREAD_BEGIN(&graph->node_list, curr){
+        node = graph_glue_to_node(curr);
+        dump_node(node);
+    } ITERATE_GLTHREAD_END(&graph->node_list, curr);
+}
+
+void dump_node(node_t *node){
+    printf("Node name: %s\n", node->node_name);
+    for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
+        if(node->interfaces[i] != NULL){
+            dump_interface(node->interfaces[i]);
+        } else break;
+    }
+}
+
+void dump_interface(interface_t *if1){
+    printf("Interface name: %s\n", if1->interface_name);
+    printf("\tLocal node: %s\n", if1->attached_node->node_name);
+    node_t *remote_node = get_nbr_node(if1);
+    if(remote_node != NULL){
+        printf("\tRemote node: %s\n", remote_node->node_name);
+    } else {
+        printf("\tRemote node: None\n");
+    }
+    printf("\tCost of link: %u\n", if1->link->cost);
 }

@@ -5,7 +5,7 @@ CFLAGS=-g -Wall -Wno-unused-variable -Wno-unused-but-set-variable -Werror=return
 all: $(objects)
 
 $(objects): %: %.c
-	    $(CC) $(CFLAGS) -o $@ $< ../../graph.c ../../gluethread/glthread.c -I../../gluethread
+	    $(CC) $(CFLAGS) -o $@ $< ../../graph.c ../../topologies.c ../../gluethread/glthread.c -I../../gluethread
 
 clean:
 	rm $(objects)
