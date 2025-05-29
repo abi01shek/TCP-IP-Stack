@@ -8,6 +8,7 @@
 #define __MY_GRAPH__H
 
 #include "gluethread/glthread.h"
+#include "net.h"
 #include <string.h>
 
 #define TOPOLOGY_NAME_SIZE 32
@@ -15,6 +16,7 @@
 #define MAX_INTERFACES_PER_NODE 16
 #define IF_NAME_SIZE 32
 
+// Forward declarations
 typedef struct graph_ graph_t;
 typedef struct node_ node_t;
 typedef struct interface_ interface_t;
@@ -30,6 +32,7 @@ typedef struct graph_ {
 typedef struct node_{
     char node_name[NODE_NAME_SIZE]; ///< name of node
     interface_t* interfaces[MAX_INTERFACES_PER_NODE]; ///< pointer to interfaces in this node
+    node_nw_props_t node_nw_props; ///< network properties
     glthread_t graph_glue;
 } node_t;
 
@@ -39,6 +42,7 @@ typedef struct interface_ {
     char interface_name[IF_NAME_SIZE]; ///< name of interface
     link_t *link; ///< which interface is this connected to
     node_t *attached_node; ///< node to which this attached to
+    intf_nw_props_t intf_nw_props; ///< network properties
 } interface_t;
 
 // Link connects two interfaces

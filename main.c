@@ -1,4 +1,4 @@
-#include "../../graph.h"
+#include "graph.h"
 #include <stdio.h>
 #include <string.h>
 

@@ -6,6 +6,7 @@
 
 #include "graph.h"
 #include "gluethread/glthread.h"
+#include "net.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,6 +50,7 @@ node_t* create_graph_node(graph_t *graph, const char *node_name){
     for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
         nodep->interfaces[i] = NULL;
     }
+    init_node_nw_prop(&nodep->node_nw_props);
     glthread_add_next(&graph->node_list, &nodep->graph_glue);
     return nodep;
 }
@@ -98,12 +100,16 @@ link_t* insert_link_between_two_nodes(node_t *node1,
     if1->interface_name[IF_NAME_SIZE-1] = '\0';
     if1->link = new_link;
     if1->attached_node = node1;
+    init_intf_nw_prop(&if1->intf_nw_props); // IP address is not configured yet
+    intf_assign_mac_addr(if1); // assign random MAC address
 
     interface_t *if2 = &new_link->if2;
     strncpy(if2->interface_name, to_if_name, IF_NAME_SIZE);
     if2->interface_name[IF_NAME_SIZE-1] = '\0';
     if2->link = new_link;
     if2->attached_node = node2;
+    init_intf_nw_prop(&if2->intf_nw_props); // IP address is not configured yet
+    intf_assign_mac_addr(if2); // assign random MAC address
 
     node1->interfaces[node1_free_if] = if1;
     node2->interfaces[node2_free_if] = if2;
@@ -141,4 +147,10 @@ void dump_interface(interface_t *if1){
         printf("\tRemote node: None\n");
     }
     printf("\tCost of link: %u\n", if1->link->cost);
+    printf("MAC address: %s\n", IF_MAC(if1).mac);
+    if(IF_IP_CONFIG(if1)){
+        printf("IP address: %s/%d\n", IF_IP(if1).ip_addr, IF_IP(if1).mask);
+    } else {
+        printf("IP address not configured\n");
+    }
 }
