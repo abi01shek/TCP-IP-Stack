@@ -121,7 +121,7 @@ link_t* insert_link_between_two_nodes(node_t *node1,
 void dump_graph(graph_t *graph){
     node_t *node;
     glthread_t *curr;
-    printf("Topology Name = %s\n", graph->topology_name);
+    printf("Topology Name = %s\n\n", graph->topology_name);
     ITERATE_GLTHREAD_BEGIN(&graph->node_list, curr){
         node = graph_glue_to_node(curr);
         dump_node(node);
@@ -130,11 +130,13 @@ void dump_graph(graph_t *graph){
 
 void dump_node(node_t *node){
     printf("Node name: %s\n", node->node_name);
+    printf("loopback IP: %s/%d\n", LOOPBACK_IP(node).ip_addr, LOOPBACK_IP(node).mask);
     for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
         if(node->interfaces[i] != NULL){
             dump_interface(node->interfaces[i]);
         } else break;
     }
+    printf("\n");
 }
 
 void dump_interface(interface_t *if1){
@@ -147,10 +149,12 @@ void dump_interface(interface_t *if1){
         printf("\tRemote node: None\n");
     }
     printf("\tCost of link: %u\n", if1->link->cost);
-    printf("MAC address: %s\n", IF_MAC(if1).mac);
+    printf("\tMAC: %02x:%02x:%02x:%02x:%02x:%02x\n", IF_MAC(if1).mac[0],
+           IF_MAC(if1).mac[1],IF_MAC(if1).mac[2],IF_MAC(if1).mac[3],
+           IF_MAC(if1).mac[4],IF_MAC(if1).mac[5]);
     if(IF_IP_CONFIG(if1)){
-        printf("IP address: %s/%d\n", IF_IP(if1).ip_addr, IF_IP(if1).mask);
+        printf("\tIP address: %s/%d\n", IF_IP(if1).ip_addr, IF_IP(if1).mask);
     } else {
-        printf("IP address not configured\n");
+        printf("\tIP address not configured\n");
     }
 }
