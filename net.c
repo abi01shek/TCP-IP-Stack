@@ -105,7 +105,7 @@ node_get_matching_subnet_interface(node_t *node, char *ip_addr){
     interface_t *curr_if;
     for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
         curr_if = node->interfaces[i];
-        if(IF_IP_CONFIG(curr_if) == 1){
+        if(IS_INTF_L3_MODE(curr_if) == 1){
             // IP is configured
             char* curr_if_ip = IF_IP(curr_if).ip_addr;
             int curr_mask = IF_IP(curr_if).mask;
