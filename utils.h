@@ -7,6 +7,6 @@
 
 extern int apply_mask(char *prefix, int mask, char *str_prefix);
 extern void layer2_fill_with_broadcast_mac(char *mac_array);
-
-
+extern unsigned int convert_ip_from_str_to_int(char *ip_addr);
+extern void convert_ip_from_int_to_str(unsigned int ip_addr, char *output_buffer);
 #endif

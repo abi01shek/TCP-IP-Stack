@@ -87,5 +87,6 @@ extern int node_set_loopback_address(node_t *node, const char *ip_addr);
 extern int intf_assign_mac_addr(interface_t *intf);
 extern int node_set_intf_ip_address(node_t *node, char *local_if, const char *ip_addr, const int mask);
 extern int node_unset_intf_ip_address(node_t *node, char *local_if);
+extern  interface_t * node_get_matching_subnet_interface(node_t *node, char *ip_addr);
 
 #endif
