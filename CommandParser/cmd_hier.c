@@ -431,6 +431,11 @@ init_libcli(){
     HIDE_PARAM(&exit_cmd);
     libcli_register_param(0, &exit_cmd);
 
+    static param_t quit_cmd;
+    init_param(&quit_cmd, CMD, QUIT, quit_cmd_handler, 0, INVALID, 0, "Quit");
+    //HIDE_PARAM(&quit_cmd);
+    libcli_register_param(0, &quit_cmd);
+
     static param_t end_cmd;
     init_param(&end_cmd, CMD, GOTO_TOP_STRING, end_cmd_handler, 0, INVALID, 0, "Goto Top level");
     HIDE_PARAM(&end_cmd);
@@ -442,7 +447,7 @@ init_libcli(){
      * else application would not be allowed to add more children into config 
      * param*/
     //support_cmd_negation(&config);
-    
+
     /* Resgister CTRL-C signal handler*/
     signal(SIGINT, ctrlC_signal_handler);
 }

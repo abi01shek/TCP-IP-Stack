@@ -48,6 +48,7 @@
 #define GOTO_ONE_LVL_UP_STRING  "cd.."
 #define CLEAR_SCR_STRING        "cls"
 #define DO                      "do"
+#define QUIT                    "quit"
 
 #define SHOW_EXTENSION_PARAM            "SHOW_EXTENSIONS"
 #define SHOW_EXTENSION_PARAM_BRIEF      "SHOW_BRIEF"

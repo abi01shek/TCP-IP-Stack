@@ -2,3 +2,4 @@
 *.o
 main
 a.out
+CMD_HIST_RECORD_FILE.txt

@@ -27,7 +27,7 @@ show_topo_callback(param_t *param,
 
 int main(){
 
-    graph_t *topo = build_first_topo();
+    topo = build_first_topo();
     /* node_t *node = get_node_by_node_name(topo, "R0_re"); */
     /* if(node != NULL){ */
     /*     dump_node(node); */

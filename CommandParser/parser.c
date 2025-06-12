@@ -35,7 +35,7 @@ char console_name[TERMINAL_NAME_SIZE];
 extern void
 run_test_case(char *file_name, uint16_t tc_no);
 
-static bool cmd_recording_enabled = true;
+static bool cmd_recording_enabled = false;
 void parse_file(char *file_name) ;
 
 static param_t*

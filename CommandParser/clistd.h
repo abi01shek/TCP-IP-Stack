@@ -83,6 +83,9 @@ int
 exit_cmd_handler(param_t *param, ser_buff_t *b, op_mode enable_or_disable);
 
 int
+quit_cmd_handler(param_t *param, ser_buff_t *b, op_mode enable_or_disable);
+
+int
 end_cmd_handler(param_t *param, ser_buff_t *b, op_mode enable_or_disable);
 
 int

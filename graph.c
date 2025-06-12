@@ -119,13 +119,17 @@ link_t* insert_link_between_two_nodes(node_t *node1,
 
 
 void dump_graph(graph_t *graph){
-    node_t *node;
-    glthread_t *curr;
-    printf("Topology Name = %s\n\n", graph->topology_name);
-    ITERATE_GLTHREAD_BEGIN(&graph->node_list, curr){
-        node = graph_glue_to_node(curr);
-        dump_node(node);
-    } ITERATE_GLTHREAD_END(&graph->node_list, curr);
+    if(graph != NULL){
+        node_t *node;
+        glthread_t *curr;
+        printf("Topology Name = %s\n\n", graph->topology_name);
+        ITERATE_GLTHREAD_BEGIN(&graph->node_list, curr){
+            node = graph_glue_to_node(curr);
+            dump_node(node);
+        } ITERATE_GLTHREAD_END(&graph->node_list, curr);
+    } else {
+        printf("Graph is null\n");
+    }
 }
 
 void dump_node(node_t *node){
