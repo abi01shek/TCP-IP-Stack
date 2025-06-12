@@ -2,6 +2,7 @@
 #include "graph.h"
 #include "string.h"
 #include <stdio.h>
+#include "utils.h"
 
 /**
  * @brief Set the loopback address of a node.
@@ -85,4 +86,37 @@ int node_unset_intf_ip_address(node_t *node, char *local_if){
     memset(&IF_IP(intf), 0, sizeof(IF_IP(intf))); // set both ip addr and mask to 0s
     IF_IP_CONFIG(intf) = 0;
     return 0;
+}
+
+
+/**
+ * @brief Given an end-point IP addr return interface in node that lies in the same subnet.
+ *
+ * @param  node: pointer to node whose interfaces are to be checked
+ * @param  ip_addr: IP address whose subnet is to be matched
+ * @return interface_t* : pointer to interface in same subnet
+ *
+ * @details
+ * Check if network address of configured interface matches
+ * input network address. If matches interface is found.
+ */
+interface_t *
+node_get_matching_subnet_interface(node_t *node, char *ip_addr){
+    interface_t *curr_if;
+    for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
+        curr_if = node->interfaces[i];
+        if(IS_INTF_L3_MODE(curr_if) == 1){
+            // IP is configured
+            char* curr_if_ip = IF_IP(curr_if).ip_addr;
+            int curr_mask = IF_IP(curr_if).mask;
+            char curr_if_subnet[17];
+            char ip_addr_subnet[17];
+            apply_mask(curr_if_ip, curr_mask, curr_if_subnet);
+            apply_mask(ip_addr, curr_mask, ip_addr_subnet);
+            if(strncmp(curr_if_subnet, ip_addr_subnet, 16) == 0){
+                return curr_if;
+            }
+        }
+    }
+    return NULL;
 }

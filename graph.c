@@ -152,7 +152,7 @@ void dump_interface(interface_t *if1){
     printf("\tMAC: %02x:%02x:%02x:%02x:%02x:%02x\n", IF_MAC(if1).mac[0],
            IF_MAC(if1).mac[1],IF_MAC(if1).mac[2],IF_MAC(if1).mac[3],
            IF_MAC(if1).mac[4],IF_MAC(if1).mac[5]);
-    if(IF_IP_CONFIG(if1)){
+    if(IS_INTF_L3_MODE(if1)){
         printf("\tIP address: %s/%d\n", IF_IP(if1).ip_addr, IF_IP(if1).mask);
     } else {
         printf("\tIP address not configured\n");
