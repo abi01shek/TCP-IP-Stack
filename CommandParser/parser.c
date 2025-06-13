@@ -143,7 +143,6 @@ build_tlv_buffer(char **tokens,
     
         if(param){
             if(IS_PARAM_LEAF(param)){
-
                 /*If it is a leaf, collect the leaf value and continue to parse. Below function performs
                  * basic standard sanity checks on the leaf value input by the user */ 
                 if(INVOKE_LEAF_LIB_VALIDATION_CALLBACK(param, *(tokens +i)) == VALIDATION_SUCCESS){

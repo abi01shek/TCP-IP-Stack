@@ -3,3 +3,5 @@
 main
 a.out
 CMD_HIST_RECORD_FILE.txt
+CommandParser/exe
+CommandParser/libcli.a

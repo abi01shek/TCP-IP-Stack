@@ -572,7 +572,6 @@ set_device_name(const char *cons_name){
 
 void
 libcli_register_param(param_t *parent, param_t *child){
-    
     int i = 0;
     if(!parent)
         parent = &root;

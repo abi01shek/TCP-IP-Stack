@@ -133,14 +133,18 @@ void dump_graph(graph_t *graph){
 }
 
 void dump_node(node_t *node){
-    printf("Node name: %s\n", node->node_name);
-    printf("loopback IP: %s/%d\n", LOOPBACK_IP(node).ip_addr, LOOPBACK_IP(node).mask);
-    for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
-        if(node->interfaces[i] != NULL){
-            dump_interface(node->interfaces[i]);
-        } else break;
+    if(node != NULL){
+        printf("Node name: %s\n", node->node_name);
+        printf("loopback IP: %s/%d\n", LOOPBACK_IP(node).ip_addr, LOOPBACK_IP(node).mask);
+        for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
+            if(node->interfaces[i] != NULL){
+                dump_interface(node->interfaces[i]);
+            } else break;
+        }
+        printf("\n");
+    } else {
+        printf("Node is null\n");
     }
-    printf("\n");
 }
 
 void dump_interface(interface_t *if1){

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
+#include <ctype.h>
 
 /**
  * @brief Apply the mask on interface IP to get the network IP address
@@ -138,4 +138,67 @@ convert_ip_from_int_to_str(unsigned int ip_addr, char *output_buffer){
     snprintf(output_buffer, 16, "%u.%u.%u.%u",
              ip_addr_f[0], ip_addr_f[1], ip_addr_f[2], ip_addr_f[3]);
     output_buffer[16] = '\0';
+}
+
+/**
+ * @brief Check if IPV4 string is a valid IP address
+ *
+ * @param  ip: string of ip address
+ * @return 0: valid IP address
+ *        -1: invalid IP address
+ */
+int is_valid_ipv4(const char *ip) {
+    int num, dots = 0;
+    const char *ptr;
+    // strtok modifies the original string so create a copy
+    char copy_ip[16];
+    strncpy(copy_ip, ip, 16); // strtok modifies the original array
+
+    // Check if the IP address is empty
+    if (*copy_ip == '\0') {
+        return -1;
+    }
+
+    // Split the COPY_IP address into parts
+    ptr = copy_ip;
+    while (*ptr) {
+        // Check for digits
+        if (!isdigit(*ptr) && *ptr != '.') {
+            return -1;
+        }
+
+        // Count the number of dots
+        if (*ptr == '.') {
+            dots++;
+            // Check if there are consecutive dots
+            if (*(ptr + 1) == '.') {
+                return -1;
+            }
+        }
+        ptr++;
+    }
+
+    // There should be exactly 3 dots in a valid IPv4 address
+    if (dots != 3) {
+        return -1;
+    }
+
+    // Reset pointer to the start of the IP address
+    // strtok modifies the original array 
+    ptr = strtok((char *)copy_ip, ".");
+    while (ptr) {
+        // Convert the string to an integer
+        num = atoi(ptr);
+        // Check if the number is in the valid range
+        if (num < 0 || num > 255) {
+            return -1;
+        }
+        // Check for leading zeros
+        if (strlen(ptr) > 1 && ptr[0] == '0') {
+            return -1;
+        }
+        ptr = strtok(NULL, ".");
+    }
+
+    return 0; // Valid IPv4 address
 }
