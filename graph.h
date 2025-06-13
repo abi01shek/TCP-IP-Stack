@@ -33,6 +33,9 @@ typedef struct node_{
     char node_name[NODE_NAME_SIZE]; ///< name of node
     interface_t* interfaces[MAX_INTERFACES_PER_NODE]; ///< pointer to interfaces in this node
     node_nw_props_t node_nw_props; ///< network properties
+    // This sock FD is where data for this node will be received.
+    int comm_udp_server_sock_fd; ///< listen UDP socket of this node
+    int comm_server_listen_port; ///< Port number to which listen socket is bound
     glthread_t graph_glue;
 } node_t;
 

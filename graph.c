@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "comm.h"
 /**
  * @brief Create a new graph data structure and initialize name.
  *
@@ -51,6 +52,7 @@ node_t* create_graph_node(graph_t *graph, const char *node_name){
         nodep->interfaces[i] = NULL;
     }
     init_node_nw_prop(&nodep->node_nw_props);
+    init_comm_server_socket(nodep);
     glthread_add_next(&graph->node_list, &nodep->graph_glue);
     return nodep;
 }
