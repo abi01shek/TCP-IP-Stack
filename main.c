@@ -2,7 +2,6 @@
 #include "graph.h"
 #include <stdio.h>
 #include <string.h>
-#include "CommandParser/libcli.h"
 #include "nmcli.h"
 
 extern graph_t * build_first_topo();

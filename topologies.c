@@ -6,6 +6,7 @@
 
 #include "graph.h"
 #include "net.h"
+#include "comm.h"
 
 // My network
 /*********************************************************************************/
@@ -30,7 +31,16 @@
 /* #endif                                                                        */
 /*********************************************************************************/
 
-
+/**
+ * @brief Create a graph of nodes.
+ *
+ * Creates nodes, configures and assigns connections between them
+ * Also starts a thread that monitors comm sockets of these nodes
+ *
+ * @param  None
+ * @return pointer to graph
+ *
+ */
 graph_t * build_first_topo() {
     graph_t *topo = create_new_graph("first_topo");
     node_t *R0_re = create_graph_node(topo, "R0_re");
@@ -84,5 +94,6 @@ graph_t * build_first_topo() {
         return NULL;
     }
 
+    network_start_pkt_receiver_thread(topo);
     return topo;
 }
