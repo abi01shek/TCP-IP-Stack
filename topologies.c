@@ -95,5 +95,10 @@ graph_t * build_first_topo() {
     }
 
     network_start_pkt_receiver_thread(topo);
+
+
+    char *message = "This is a test message\n";
+    send_pkt_out(message, strlen(message), R0_re->interfaces[0]);
+
     return topo;
 }

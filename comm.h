@@ -8,5 +8,6 @@
 
 int init_comm_server_socket(node_t *node);
 int network_start_pkt_receiver_thread(graph_t *topo);
+int send_pkt_out(char *pkt, size_t pkt_size, interface_t* out_interface);
 
 #endif

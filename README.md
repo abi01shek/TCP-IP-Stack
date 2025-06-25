@@ -45,3 +45,10 @@ echo "hi" | nc -u 127.0.0.1 40000
 This data is received by the running thread and printed on screen.
 
 
+
+### Sending data from one node to another
+A data is sent on a link which connects one interface to another. Each interface is connected to one other interface through a link. Thus given an interface and a port number we can identify the node to send the data to. Then as in the test case above, we can write the data using a UDP socket.
+
+Thus given an interface to send packet via, the link of that interface is got and the destination interface is got from the link. From the destination interface we get the node attached to it and get its port number before we create a UDP socket and send data to this port. Inorder to identify the interface on which a node receives this packet, we encapuste the RX interface name as the header followed by the data as the payload
+
+The thread that epolls on these sockets will receive the data, parse the header and call the appropriate handler of that message at that node.
