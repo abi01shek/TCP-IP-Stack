@@ -1,3 +1,9 @@
+/**
+ * @file comm.c
+ * @author Abishek
+ * @brief Methods to setup communication between nodes
+ */
+
 #include "comm.h"
 #include "gluethread/glthread.h"
 #include "graph.h"
@@ -30,6 +36,26 @@ static uint32_t get_next_free_port(){
     uint32_t ret = next_free_port;
     next_free_port++;
     return ret;
+}
+
+
+/**
+ * @brief Receive comm packet
+ *
+ * exctracts interface name from comm packet and forwards payload
+ * to data link receiver module
+ *
+ */
+static int _comm_pkt_recv(node_t *node, char *comm_pkt, size_t comm_pkt_size){
+    // extract the rx interface of the packet
+    char *rx_if_name = comm_pkt; // we can do this because we have \0 character at end of if name.
+    interface_t *rx_if = get_node_if_by_name(node, rx_if_name);
+    if(rx_if == NULL){
+        printf("Unable to locate interface %s\n", rx_if_name);
+        return -1;
+    }
+    data_link_pkt_receive(node, rx_if, comm_pkt + IF_NAME_SIZE, (comm_pkt_size-IF_NAME_SIZE));
+    return 0;
 }
 
 /**
@@ -69,16 +95,6 @@ int init_comm_server_socket(node_t *node){
     node->comm_udp_server_sock_fd = sockfd;
 
     return 0; //success
-}
-
-int _comm_pkt_recv(node_t *node, char *comm_pkt, size_t comm_pkt_size){
-    // extract the rx interface of the packet
-    char *rx_if_name = comm_pkt;
-    printf("Rx node name: %s\n", node->node_name);
-    printf("Rx if name: %s\n", rx_if_name);
-    printf("Data: %s\n", comm_pkt+IF_NAME_SIZE);
-    printf("Data size: %lu\n", comm_pkt_size);
-    return 0;
 }
 
 /**
@@ -162,10 +178,14 @@ void* __network_start_pkt_receiver_thread(void* arg) {
                 /*        buffer, buffer+IF_NAME_SIZE); */
 
                 // recv comm packet by the node.
-                _comm_pkt_recv(rx_node, buffer, len);
+                if(_comm_pkt_recv(rx_node, buffer, len) < 0 ){
+                    printf("Unable to recv packet\n");
+                    break;
+                }
             }
         }
     }
+    // if control reaches here, something is wrong.
     close(epoll_fd);
     return NULL;
 }
@@ -294,4 +314,55 @@ int send_pkt_out(char *pkt, size_t pkt_size, interface_t* out_interface){
     int ret = _send_pkt_out(to_node_port, sndbuf, IF_NAME_SIZE+pkt_size);
     free(sndbuf);
     return ret;
+}
+
+
+
+/**
+ * @brief send the packet pkt out of all interfaces of a node, except the excempted interface
+ *
+ * @param  node: pointer to node
+ * @param  exempted_intf: pointer to excepted interface
+ * @param  pkt: pointer of data to flood
+ * @param  pkt_size: size of data
+ * @return 0 : success
+ *         -1: fail
+ */
+int send_pkt_flood(node_t *node, interface_t *exempted_intf,
+                   char *pkt, unsigned int pkt_size){
+    for(int i=0; i<MAX_INTERFACES_PER_NODE; i++){
+        interface_t *cur_if = node->interfaces[i];
+        if(cur_if != NULL){
+            if(cur_if != exempted_intf){
+                if(send_pkt_out(pkt, pkt_size, cur_if) < 0){
+                    printf("Sending packet failed\n");
+                    return -1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+
+/**
+ * @brief Data link packet receive handler.
+ *
+ * <what fn does>
+ *
+ * @param  node
+ * @param  receive interface
+ * @param  data-link packet
+ * @param  data-link packet size
+ * @return 0: Success
+ *        -1: Fail
+ */
+int data_link_pkt_receive(node_t *node, interface_t *rx_if,
+                char *pkt, size_t pkt_size){
+    /* Entry point into data link layer from physical layer */
+    printf("Rx node name: %s\n", node->node_name);
+    printf("Rx if name: %s\n", rx_if->interface_name);
+    printf("Data: %s\n", pkt);
+    printf("Data size: %lu\n", pkt_size);
+    return 0;
 }
