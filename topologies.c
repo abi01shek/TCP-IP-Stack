@@ -98,8 +98,8 @@ graph_t * build_first_topo() {
 
 
     char *message = "This is a test message\n";
-    send_pkt_flood(R0_re, R0_re->interfaces[0], message, strlen(message));
-    //send_pkt_out(message, strlen(message), R0_re->interfaces[0]);
+    //send_pkt_flood(R0_re, R0_re->interfaces[0], message, strlen(message));
+    send_pkt_out(message, strlen(message), R0_re->interfaces[0]);
 
     return topo;
 }

@@ -1,6 +1,7 @@
 #ifndef __MY_NET__H
 #define __MY_NET__H
 
+#include <cstdint>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +16,7 @@ typedef struct ip_addr_ {
 } ip_addr_t;
 
 typedef struct mac_addr_{
-    char mac[7]; // 48 bits (6 bytes) plus null character
+    uint8_t mac[7]; // 48 bits (6 bytes) plus null character
 }mac_addr_t;
 
 /** @struct node_nw_props_t

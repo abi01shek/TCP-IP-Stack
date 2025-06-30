@@ -18,6 +18,7 @@
 #include <sys/epoll.h>
 #include "gluethread/glthread.h"
 #include "net.h"
+#include "layer2.h"
 
 // packet format is 32 bytes of header with interface name
 // rest 2016 bytes of payload
@@ -348,7 +349,7 @@ int send_pkt_flood(node_t *node, interface_t *exempted_intf,
 /**
  * @brief Data link packet receive handler.
  *
- * <what fn does>
+ * This is the entry point of ethernet frame into layer 2
  *
  * @param  node
  * @param  receive interface
@@ -359,10 +360,31 @@ int send_pkt_flood(node_t *node, interface_t *exempted_intf,
  */
 int data_link_pkt_receive(node_t *node, interface_t *rx_if,
                 char *pkt, size_t pkt_size){
+
     /* Entry point into data link layer from physical layer */
+
+    // Simulate ethernet reception by encapsulating the packet
+    // within the ethernet frame
+    ethernet_hdr_t rx_eth_frame;
+    if(pkt_size > ETH_FRAME_MTU){
+        printf("RX comm packet received cannot have payload bigger than MTU\n");
+        return -1;
+    }
+    char *ethfp = alloc_eth_frame(pkt, pkt_size);
+    if(ethfp == NULL){
+        printf("Unable to allocate ethernet frame\n");
+        return -1;
+    }
+
+    ethernet_hdr_t *eth_hdr = (ethernet_hdr_t*) ethfp;
+    uint16_t payload_size = eth_hdr->ethertype;
+    char *payload = ethfp + sizeof(ethernet_hdr_t);
+    payload[payload_size-1] = '\0';
+
+
     printf("Rx node name: %s\n", node->node_name);
     printf("Rx if name: %s\n", rx_if->interface_name);
-    printf("Data: %s\n", pkt);
-    printf("Data size: %lu\n", pkt_size);
+    printf("Data: %s\n", payload);
+    printf("Data size: %hu\n", payload_size);
     return 0;
 }
