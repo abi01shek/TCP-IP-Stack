@@ -2,9 +2,11 @@
 #define __MY_NET__H
 
 #include <cstdint>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 // Forward declaration will be defined later
 typedef struct node_ node_t;
@@ -90,4 +92,36 @@ extern int node_set_intf_ip_address(node_t *node, char *local_if, const char *ip
 extern int node_unset_intf_ip_address(node_t *node, char *local_if);
 extern  interface_t * node_get_matching_subnet_interface(node_t *node, char *ip_addr);
 
+/**
+ * @brief Convert IPv4 from text to binary form.
+ *
+ * @param  IP address in text form
+ * @param  IP address in number form or 0 in case of failure
+ */
+inline uint32_t ip_addr_p_to_n(char *ip_addr){
+    uint32_t ip_num;
+    if(inet_pton(AF_INET, ip_addr, &ip_num) < 0){
+        perror("inet_pton");
+        return 0;
+    }
+    return ip_num;
+}
+
+/**
+ * @brief Convert IPv4 from binary to text form.
+ *
+ * @param  src IP address in number form
+ * @param  dest pointer to IP address in text form
+ */
+inline void ip_addr_n_to_p(uint32_t ip_addr, char *ip_add_str){
+    if(ip_add_str == NULL){
+        printf("IP address string destination cannot be NULL\n");
+        return;
+    }
+    if(inet_ntop(AF_INET, &ip_addr, ip_add_str, 16) == NULL){
+        perror("inet_ntop");
+        return;
+    }
+    return;
+}
 #endif

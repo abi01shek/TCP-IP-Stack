@@ -1,6 +1,7 @@
 #ifndef __MY_LAYER2_H
 #define __MY_LAYER2_H
 
+#include "gluethread/glthread.h"
 #include "net.h"
 #include "graph.h"
 #include <stdint.h>
@@ -9,6 +10,24 @@
 
 #define ETH_FRAME_MTU 1500
 #define ARP_ETHERTYPE 0x806
+
+/**
+ * Linked list of ARP entries denoting an ARP table
+ *
+ */
+typedef struct arp_tbl_ {
+    glthread_t arp_tbl_list; ///< linked list of arp entries
+} arp_tbl_t;
+
+typedef struct arp_tbl_entry_ {
+    uint32_t ip_n; ///< IP address numerical (key)
+    mac_addr_t mac; ///< MAC addr corresponding to IP address
+    char if_name[IF_NAME_SIZE]; ///< Interface name
+    glthread_t arp_glue;
+} arp_tbl_entry_t;
+
+// map function to extract arp information from gl linked list node
+GLTHREAD_TO_STRUCT(arp_glue_to_arp_entry, arp_tbl_entry_t, arp_glue);
 
 
 typedef struct arp_pkt_{
@@ -82,6 +101,17 @@ static inline int l2_recv_qualify_at_if(interface_t *intfp, ethernet_hdr_t * eth
     }
     return 1; // Continue to next layer
 }
+
+
+
+/**
+ * ARP Table CRUD
+ *
+ */
+arp_tbl_t* create_arp_tbl();
+arp_tbl_entry_t* lookup_arp_tbl_entry(arp_tbl_t* arp_tbl, uint32_t ip_num);
+arp_tbl_entry_t* add_arp_tbl_entry(arp_tbl_t* arp_tbl, uint32_t ip_num, mac_addr_t mac, char *if_name);
+void delete_arp_tbl_entry(arp_tbl_t* arp_tbl, uint32_t ip_num);
 
 
 
